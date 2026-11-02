@@ -20,14 +20,56 @@ const { NotImplementedError } = require('../lib');
  *
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+  letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  string;
+  keyCopy;
+
+  constructor(type = true) {
+    this.type = type;
   }
 
-  decrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+  encrypt(str, key) {
+    return this.#process(str, key, true);
+  }
+
+  decrypt(str, key) {
+    return this.#process(str, key, false);
+  }
+  #check(str, key) {
+    if (!str || !key) {
+      throw new Error("Incorrect arguments!");
+    }
+  }
+  #process(str, key, isEncrypt) {
+    this.#check(str, key);
+
+    this.string = str.toUpperCase();
+    this.keyCopy = key.toUpperCase();
+
+    let result = "";
+    let counter = 0;
+
+    for (let i = 0; i < this.string.length; i++) {
+      if (counter >= this.keyCopy.length) {
+        counter = 0;
+      }
+
+      if (this.letters.includes(this.string[i])) {
+        const charIndex = this.letters.indexOf(this.string[i]);
+        const letterIndex = this.letters.indexOf(this.keyCopy[counter]);
+        const offset = charIndex + (isEncrypt ? letterIndex : -letterIndex);
+
+        // Нормализуем индекс и добавляем символ в результат
+        result +=
+          this.letters[(offset + this.letters.length) % this.letters.length];
+        counter++;
+      } else {
+        result += this.string[i];
+      }
+    }
+
+    // Возвращаем результат с учетом типа машины (обычная или реверсивная)
+    return this.type ? result : [...result].reverse().join("");
   }
 }
 
